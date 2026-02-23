@@ -46,6 +46,18 @@
         }
         .btn:active { transform: scale(0.98); }
         .btn-primary { background-color: var(--primary-color); color: #000; font-weight: bold; border: none; }
+        
+        /* استایل دکمه پاک کردن */
+        .btn-danger {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            font-weight: bold;
+        }
+        .btn-danger:hover {
+            background-color: rgba(207, 102, 121, 0.1);
+        }
+
         input[type="password"], select {
             padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
             background-color: #2c2c2c; color: var(--text-color); outline: none; width: 100%;
@@ -94,6 +106,10 @@
         <button class="btn" onclick="pasteAndDecrypt()">Paste & Decrypt</button>
     </div>
 
+    <div class="controls" style="margin-top: 5px;">
+        <button class="btn btn-danger" onclick="clearAllFields()">🗑 Clear Everything</button>
+    </div>
+
     <div id="statusMsg"></div>
 
     <div class="about">Developed by me</div>
@@ -107,11 +123,47 @@
     const expirationSelect = document.getElementById('expirationSelect');
     const statusMsg = document.getElementById('statusMsg');
 
+    let inactivityTimer;
+    const TIME_LIMIT = 60000;
+
+    function clearSensitiveData() {
+        if(messageBox.value !== '' || secretKeyInput.value !== '') {
+            messageBox.value = '';
+            secretKeyInput.value = '';
+            localStorage.removeItem('savedMessage');
+            updateStats();
+            showStatus('🔒 Data auto-cleared due to 1 minute of inactivity.', 'var(--error-color)');
+        }
+    }
+
+    function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(clearSensitiveData, TIME_LIMIT);
+    }
+
+    ['touchstart', 'click', 'keypress', 'mousemove', 'scroll'].forEach(evt => {
+        document.addEventListener(evt, resetTimer);
+    });
+
+    // تابع جدید برای پاکسازی دستی با دکمه
+    function clearAllFields() {
+        messageBox.value = '';
+        secretKeyInput.value = '';
+        localStorage.removeItem('savedMessage');
+        updateStats();
+        showStatus('🗑 All fields cleared!', 'var(--success-color)');
+        resetTimer(); // ریست کردن زمان‌سنج بعد از پاکسازی
+    }
+
     window.onload = () => {
-        if(localStorage.getItem('savedMessage')) messageBox.value = localStorage.getItem('savedMessage');
+        localStorage.removeItem('savedMessage');
+        messageBox.value = '';
+        secretKeyInput.value = '';
+        
         if(localStorage.getItem('savedFileName')) fileName.value = localStorage.getItem('savedFileName');
         if(localStorage.getItem('savedDir')) messageBox.dir = localStorage.getItem('savedDir');
         updateStats();
+        resetTimer();
     };
 
     messageBox.addEventListener('input', () => {
@@ -175,26 +227,39 @@
         return bytes.buffer;
     }
 
+    async function compressData(dataString) {
+        const stream = new Blob([dataString]).stream();
+        const compressedStream = stream.pipeThrough(new CompressionStream("gzip"));
+        const response = new Response(compressedStream);
+        return await response.arrayBuffer();
+    }
+
+    async function decompressData(buffer) {
+        const stream = new Blob([buffer]).stream();
+        const decompressedStream = stream.pipeThrough(new DecompressionStream("gzip"));
+        const response = new Response(decompressedStream);
+        return await response.arrayBuffer();
+    }
+
     async function encryptMessage() {
         if (!secretKeyInput.value || !messageBox.value) return showStatus('Password and Message are required.', 'var(--error-color)');
         try {
-            // محاسبه زمان انقضا
             const expHours = parseInt(expirationSelect.value);
             const expTime = expHours === 0 ? 0 : Date.now() + (expHours * 60 * 60 * 1000);
             
-            // بسته‌بندی پیام و زمان انقضا با هم
             const payload = JSON.stringify({ exp: expTime, msg: messageBox.value });
+            const compressedBuffer = await compressData(payload);
 
             const salt = window.crypto.getRandomValues(new Uint8Array(16));
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const key = await getCryptoKey(secretKeyInput.value, salt);
             
-            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(payload));
+            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, compressedBuffer);
             messageBox.value = bufferToBase64(salt) + ":" + bufferToBase64(iv) + ":" + bufferToBase64(encrypted);
             
             localStorage.setItem('savedMessage', messageBox.value); updateStats();
-            showStatus('Message Encrypted (with expiration rule)!', 'var(--success-color)');
-        } catch (e) { showStatus('Encryption failed!', 'var(--error-color)'); }
+            showStatus('Message Compressed & Encrypted!', 'var(--success-color)');
+        } catch (e) { showStatus('Encryption failed!', 'var(--error-color)'); console.error(e); }
     }
 
     async function decryptMessage() {
@@ -204,31 +269,32 @@
             if (parts.length !== 3) throw new Error("Invalid format");
             
             const key = await getCryptoKey(secretKeyInput.value, base64ToBuffer(parts[0]));
-            const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(parts[1]) }, key, base64ToBuffer(parts[2]));
+            const decryptedBuffer = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(parts[1]) }, key, base64ToBuffer(parts[2]));
             
-            const decryptedText = new TextDecoder().decode(decrypted);
+            let decryptedText = "";
+            try {
+                const decompressedBuffer = await decompressData(decryptedBuffer);
+                decryptedText = new TextDecoder().decode(decompressedBuffer);
+            } catch (decompressionErr) {
+                decryptedText = new TextDecoder().decode(decryptedBuffer);
+            }
             
-            // تلاش برای خواندن فرمت جدید (دارای زمان انقضا)
             try {
                 const payload = JSON.parse(decryptedText);
-                
-                // چک کردن زمان انقضا
                 if (payload.exp !== 0 && Date.now() > payload.exp) {
-                    messageBox.value = ''; // پاک کردن کادر
+                    messageBox.value = '';
                     localStorage.setItem('savedMessage', '');
                     updateStats();
-                    return showStatus('⏳ Access Denied: This message has expired and self-destructed.', 'var(--error-color)');
+                    return showStatus('⏳ Access Denied: Message expired.', 'var(--error-color)');
                 }
-                
                 messageBox.value = payload.msg;
             } catch (jsonErr) {
-                // پشتیبانی از پیام‌های قدیمی (قبل از اضافه شدن این قابلیت)
                 messageBox.value = decryptedText;
             }
 
             localStorage.setItem('savedMessage', messageBox.value); updateStats();
             showStatus('Message Decrypted successfully!', 'var(--success-color)');
-        } catch (e) { showStatus('Decryption failed! Wrong password or invalid text.', 'var(--error-color)'); }
+        } catch (e) { showStatus('Decryption failed! Wrong password.', 'var(--error-color)'); console.error(e); }
     }
 
     if ('serviceWorker' in navigator) {
