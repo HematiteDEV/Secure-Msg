@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Offline Messenger</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --error-color: #cf6679;
+            --success-color: #03dac6;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+        .header-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+            padding-bottom: 8px;
+            box-sizing: border-box;
+        }
+        .header-input:focus {
+            border-bottom-color: var(--primary-color);
+        }
+        textarea {
+            width: 100%;
+            height: 160px;
+            background-color: #2c2c2c;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            line-height: 1.5;
+        }
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap; /* جلوگیری از بهم ریختگی در موبایل */
+        }
+        .btn {
+            background-color: #333;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: bold;
+            border: none;
+        }
+        input[type="password"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #2c2c2c;
+            color: var(--text-color);
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input[type="password"]:focus {
+            border-color: var(--primary-color);
+        }
+        .stats {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 8px;
+        }
+        .about {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #777;
+        }
+        #statusMsg {
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-align: center;
+            min-height: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <input type="text" id="fileName" class="header-input" value="Untitled Document" placeholder="Document Name">
+
+    <div class="controls">
+        <button class="btn" onclick="setTextDir('ltr')">Left-to-Right (EN)</button>
+        <button class="btn" onclick="setTextDir('rtl')">Right-to-Left (FA)</button>
+    </div>
+
+    <textarea id="messageBox" placeholder="Type your message or paste encrypted text here..."></textarea>
+    
+    <div class="stats" id="statsDisplay">Characters: 0 | Words: 0</div>
+
+    <div class="controls" style="margin-top: 20px;">
+        <input type="password" id="secretKey" placeholder="Enter Secret Password">
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="encryptMessage()">Encrypt</button>
+        <button class="btn btn-primary" onclick="decryptMessage()">Decrypt</button>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+        <button class="btn" onclick="pasteAndDecrypt()">Paste & Decrypt</button>
+    </div>
+
+    <div id="statusMsg"></div>
+
+    <div class="about">Developed by me</div>
+</div>
+
+<script>
+    const messageBox = document.getElementById('messageBox');
+    const fileName = document.getElementById('fileName');
+    const statsDisplay = document.getElementById('statsDisplay');
+    const secretKeyInput = document.getElementById('secretKey');
+    const statusMsg = document.getElementById('statusMsg');
+
+    window.onload = () => {
+        if(localStorage.getItem('savedMessage')) messageBox.value = localStorage.getItem('savedMessage');
+        if(localStorage.getItem('savedFileName')) fileName.value = localStorage.getItem('savedFileName');
+        if(localStorage.getItem('savedDir')) messageBox.dir = localStorage.getItem('savedDir');
+        updateStats();
+    };
+
+    messageBox.addEventListener('input', () => {
+        localStorage.setItem('savedMessage', messageBox.value);
+        updateStats();
+    });
+
+    fileName.addEventListener('input', () => {
+        localStorage.setItem('savedFileName', fileName.value);
+    });
+
+    function updateStats() {
+        const text = messageBox.value;
+        statsDisplay.textContent = `Characters: ${text.length} | Words: ${text.trim() === '' ? 0 : text.trim().split(/\s+/).length}`;
+    }
+
+    function setTextDir(dir) {
+        messageBox.dir = dir;
+        localStorage.setItem('savedDir', dir);
+    }
+
+    function showStatus(msg, color = 'var(--primary-color)') {
+        statusMsg.textContent = msg;
+        statusMsg.style.color = color;
+        setTimeout(() => statusMsg.textContent = '', 4000);
+    }
+
+    async function copyToClipboard() {
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(messageBox.value);
+                showStatus('Copied to clipboard successfully!', 'var(--success-color)');
+            } else {
+                messageBox.select();
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                showStatus('Copied to clipboard (Legacy Mode)!', 'var(--success-color)');
+            }
+        }
+        catch (err) {
+            showStatus('Copy failed. Please select text and copy manually.', 'var(--error-color)');
+        }
+    }
+
+    async function pasteAndDecrypt() {
+        try {
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                const text = await navigator.clipboard.readText();
+                if(text) {
+                    messageBox.value = text;
+                    decryptMessage();
+                } else {
+                    showStatus('Clipboard is empty.', 'var(--error-color)');
+                }
+            } else {
+                showStatus('Auto-paste blocked. Please paste manually and click Decrypt.', 'var(--error-color)');
+            }
+        }
+        catch (err) {
+            showStatus('Auto-paste blocked. Please paste manually and click Decrypt.', 'var(--error-color)');
+        }
+    }
+
+    async function getCryptoKey(password, salt) {
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+        return window.crypto.subtle.deriveKey(
+            { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+            keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+        );
+    }
+
+    function bufferToBase64(buffer) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer))); }
+    function base64ToBuffer(base64) {
+        const binary = atob(base64); const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return bytes.buffer;
+    }
+
+    async function encryptMessage() {
+        if (!secretKeyInput.value || !messageBox.value) return showStatus('Password and Message are required.', 'var(--error-color)');
+        try {
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const key = await getCryptoKey(secretKeyInput.value, salt);
+            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(messageBox.value));
+            messageBox.value = bufferToBase64(salt) + ":" + bufferToBase64(iv) + ":" + bufferToBase64(encrypted);
+            localStorage.setItem('savedMessage', messageBox.value);
+            updateStats();
+            showStatus('Message Encrypted!', 'var(--success-color)');
+        } catch (e) {
+            showStatus('Encryption failed!', 'var(--error-color)');
+        }
+    }
+
+    async function decryptMessage() {
+        if (!secretKeyInput.value || !messageBox.value) return showStatus('Password and Message are required.', 'var(--error-color)');
+        try {
+            const parts = messageBox.value.split(':');
+            if (parts.length !== 3) throw new Error("Invalid format");
+            const key = await getCryptoKey(secretKeyInput.value, base64ToBuffer(parts[0]));
+            const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(parts[1]) }, key, base64ToBuffer(parts[2]));
+            messageBox.value = new TextDecoder().decode(decrypted);
+            localStorage.setItem('savedMessage', messageBox.value);
+            updateStats();
+            showStatus('Message Decrypted successfully!', 'var(--success-color)');
+        } catch (e) {
+            showStatus('Decryption failed! Wrong password or invalid text.', 'var(--error-color)');
+        }
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.error('SW Error:', err));
+        });
+    }
+</script>
+</body>
+</html>
