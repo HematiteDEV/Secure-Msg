@@ -17,120 +17,44 @@
             --success-color: #03dac6;
         }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-color); color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
         }
         .container {
-            width: 100%;
-            max-width: 500px;
-            background-color: var(--surface-color);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            width: 100%; max-width: 500px; background-color: var(--surface-color);
+            padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); box-sizing: border-box;
         }
         .header-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid var(--border-color);
-            color: var(--text-color);
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 20px;
-            outline: none;
-            padding-bottom: 8px;
-            box-sizing: border-box;
+            width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--border-color);
+            color: var(--text-color); font-size: 1.4rem; font-weight: bold; text-align: center;
+            margin-bottom: 20px; outline: none; padding-bottom: 8px; box-sizing: border-box;
         }
-        .header-input:focus {
-            border-bottom-color: var(--primary-color);
-        }
+        .header-input:focus { border-bottom-color: var(--primary-color); }
         textarea {
-            width: 100%;
-            height: 160px;
-            background-color: #2c2c2c;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 1rem;
-            resize: vertical;
-            box-sizing: border-box;
-            outline: none;
-            line-height: 1.5;
+            width: 100%; height: 160px; background-color: #2c2c2c; color: var(--text-color);
+            border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;
+            font-size: 1rem; resize: vertical; box-sizing: border-box; outline: none; line-height: 1.5;
         }
-        textarea:focus {
-            border-color: var(--primary-color);
-        }
+        textarea:focus { border-color: var(--primary-color); }
         .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap; /* جلوگیری از بهم ریختگی در موبایل */
+            display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 15px; align-items: center; gap: 10px; flex-wrap: wrap;
         }
         .btn {
-            background-color: #333;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            flex-grow: 1;
-            font-size: 0.9rem;
-            text-align: center;
-            transition: 0.2s;
+            background-color: #333; color: var(--text-color); border: 1px solid var(--border-color);
+            padding: 10px 12px; border-radius: 8px; cursor: pointer; flex-grow: 1; font-size: 0.9rem; text-align: center; transition: 0.2s;
         }
-        .btn:active {
-            transform: scale(0.98);
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--primary-color); color: #000; font-weight: bold; border: none; }
+        input[type="password"], select {
+            padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
+            background-color: #2c2c2c; color: var(--text-color); outline: none; width: 100%;
+            box-sizing: border-box; font-size: 1rem;
         }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: #000;
-            font-weight: bold;
-            border: none;
-        }
-        input[type="password"] {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: #2c2c2c;
-            color: var(--text-color);
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        input[type="password"]:focus {
-            border-color: var(--primary-color);
-        }
-        .stats {
-            font-size: 0.85rem;
-            color: #aaa;
-            margin-top: 8px;
-        }
-        .about {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.85rem;
-            color: #777;
-        }
-        #statusMsg {
-            font-size: 0.9rem;
-            margin-top: 15px;
-            text-align: center;
-            min-height: 20px;
-            font-weight: bold;
-        }
+        input[type="password"]:focus, select:focus { border-color: var(--primary-color); }
+        .stats { font-size: 0.85rem; color: #aaa; margin-top: 8px; }
+        .about { text-align: center; margin-top: 30px; font-size: 0.85rem; color: #777; }
+        #statusMsg { font-size: 0.9rem; margin-top: 15px; text-align: center; min-height: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -149,6 +73,15 @@
 
     <div class="controls" style="margin-top: 20px;">
         <input type="password" id="secretKey" placeholder="Enter Secret Password">
+    </div>
+
+    <div class="controls" style="margin-top: 5px;">
+        <select id="expirationSelect">
+            <option value="0">⏳ No Expiration (Never)</option>
+            <option value="1">⏳ Expires in 1 Hour</option>
+            <option value="24">⏳ Expires in 24 Hours</option>
+            <option value="168">⏳ Expires in 7 Days</option>
+        </select>
     </div>
 
     <div class="controls">
@@ -171,6 +104,7 @@
     const fileName = document.getElementById('fileName');
     const statsDisplay = document.getElementById('statsDisplay');
     const secretKeyInput = document.getElementById('secretKey');
+    const expirationSelect = document.getElementById('expirationSelect');
     const statusMsg = document.getElementById('statusMsg');
 
     window.onload = () => {
@@ -185,9 +119,7 @@
         updateStats();
     });
 
-    fileName.addEventListener('input', () => {
-        localStorage.setItem('savedFileName', fileName.value);
-    });
+    fileName.addEventListener('input', () => { localStorage.setItem('savedFileName', fileName.value); });
 
     function updateStats() {
         const text = messageBox.value;
@@ -202,7 +134,7 @@
     function showStatus(msg, color = 'var(--primary-color)') {
         statusMsg.textContent = msg;
         statusMsg.style.color = color;
-        setTimeout(() => statusMsg.textContent = '', 4000);
+        setTimeout(() => statusMsg.textContent = '', 4500);
     }
 
     async function copyToClipboard() {
@@ -211,34 +143,20 @@
                 await navigator.clipboard.writeText(messageBox.value);
                 showStatus('Copied to clipboard successfully!', 'var(--success-color)');
             } else {
-                messageBox.select();
-                document.execCommand('copy');
-                window.getSelection().removeAllRanges();
+                messageBox.select(); document.execCommand('copy'); window.getSelection().removeAllRanges();
                 showStatus('Copied to clipboard (Legacy Mode)!', 'var(--success-color)');
             }
-        }
-        catch (err) {
-            showStatus('Copy failed. Please select text and copy manually.', 'var(--error-color)');
-        }
+        } catch (err) { showStatus('Copy failed. Please select text and copy manually.', 'var(--error-color)'); }
     }
 
     async function pasteAndDecrypt() {
         try {
             if (navigator.clipboard && navigator.clipboard.readText) {
                 const text = await navigator.clipboard.readText();
-                if(text) {
-                    messageBox.value = text;
-                    decryptMessage();
-                } else {
-                    showStatus('Clipboard is empty.', 'var(--error-color)');
-                }
-            } else {
-                showStatus('Auto-paste blocked. Please paste manually and click Decrypt.', 'var(--error-color)');
-            }
-        }
-        catch (err) {
-            showStatus('Auto-paste blocked. Please paste manually and click Decrypt.', 'var(--error-color)');
-        }
+                if(text) { messageBox.value = text; decryptMessage(); }
+                else { showStatus('Clipboard is empty.', 'var(--error-color)'); }
+            } else { showStatus('Auto-paste blocked. Please paste manually and click Decrypt.', 'var(--error-color)'); }
+        } catch (err) { showStatus('Auto-paste blocked. Please paste manually and click Decrypt.', 'var(--error-color)'); }
     }
 
     async function getCryptoKey(password, salt) {
@@ -260,17 +178,23 @@
     async function encryptMessage() {
         if (!secretKeyInput.value || !messageBox.value) return showStatus('Password and Message are required.', 'var(--error-color)');
         try {
+            // محاسبه زمان انقضا
+            const expHours = parseInt(expirationSelect.value);
+            const expTime = expHours === 0 ? 0 : Date.now() + (expHours * 60 * 60 * 1000);
+            
+            // بسته‌بندی پیام و زمان انقضا با هم
+            const payload = JSON.stringify({ exp: expTime, msg: messageBox.value });
+
             const salt = window.crypto.getRandomValues(new Uint8Array(16));
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const key = await getCryptoKey(secretKeyInput.value, salt);
-            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(messageBox.value));
+            
+            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(payload));
             messageBox.value = bufferToBase64(salt) + ":" + bufferToBase64(iv) + ":" + bufferToBase64(encrypted);
-            localStorage.setItem('savedMessage', messageBox.value);
-            updateStats();
-            showStatus('Message Encrypted!', 'var(--success-color)');
-        } catch (e) {
-            showStatus('Encryption failed!', 'var(--error-color)');
-        }
+            
+            localStorage.setItem('savedMessage', messageBox.value); updateStats();
+            showStatus('Message Encrypted (with expiration rule)!', 'var(--success-color)');
+        } catch (e) { showStatus('Encryption failed!', 'var(--error-color)'); }
     }
 
     async function decryptMessage() {
@@ -278,21 +202,37 @@
         try {
             const parts = messageBox.value.split(':');
             if (parts.length !== 3) throw new Error("Invalid format");
+            
             const key = await getCryptoKey(secretKeyInput.value, base64ToBuffer(parts[0]));
             const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(parts[1]) }, key, base64ToBuffer(parts[2]));
-            messageBox.value = new TextDecoder().decode(decrypted);
-            localStorage.setItem('savedMessage', messageBox.value);
-            updateStats();
+            
+            const decryptedText = new TextDecoder().decode(decrypted);
+            
+            // تلاش برای خواندن فرمت جدید (دارای زمان انقضا)
+            try {
+                const payload = JSON.parse(decryptedText);
+                
+                // چک کردن زمان انقضا
+                if (payload.exp !== 0 && Date.now() > payload.exp) {
+                    messageBox.value = ''; // پاک کردن کادر
+                    localStorage.setItem('savedMessage', '');
+                    updateStats();
+                    return showStatus('⏳ Access Denied: This message has expired and self-destructed.', 'var(--error-color)');
+                }
+                
+                messageBox.value = payload.msg;
+            } catch (jsonErr) {
+                // پشتیبانی از پیام‌های قدیمی (قبل از اضافه شدن این قابلیت)
+                messageBox.value = decryptedText;
+            }
+
+            localStorage.setItem('savedMessage', messageBox.value); updateStats();
             showStatus('Message Decrypted successfully!', 'var(--success-color)');
-        } catch (e) {
-            showStatus('Decryption failed! Wrong password or invalid text.', 'var(--error-color)');
-        }
+        } catch (e) { showStatus('Decryption failed! Wrong password or invalid text.', 'var(--error-color)'); }
     }
 
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.error('SW Error:', err));
-        });
+        window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.error('SW Error:', err)); });
     }
 </script>
 </body>
