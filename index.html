@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,58 +8,85 @@
     <meta name="theme-color" content="#121212">
     <style>
         :root {
-            --bg-color: #121212; --surface-color: #1e1e1e; --primary-color: #bb86fc;
-            --text-color: #e0e0e0; --border-color: #333; --error-color: #cf6679; --success-color: #03dac6;
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --error-color: #cf6679;
+            --success-color: #03dac6;
         }
         body {
-            background-color: var(--bg-color); color: var(--text-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
-            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+            margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center;
         }
         .container {
-            width: 100%; max-width: 500px; background-color: var(--surface-color);
-            padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); box-sizing: border-box;
+            width: 100%; max-width: 500px;
+            background-color: var(--surface-color);
+            padding: 24px; border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6); box-sizing: border-box;
+        }
+        .app-header {
+            text-align: center; font-size: 1.55rem; font-weight: bold;
+            margin-bottom: 20px; display: flex; align-items: center;
+            justify-content: center; gap: 10px;
         }
         .header-input {
-            width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--border-color);
-            color: var(--text-color); font-size: 1.4rem; font-weight: bold; text-align: center;
-            margin-bottom: 20px; outline: none; padding-bottom: 8px; box-sizing: border-box;
+            width: 100%; background: transparent; border: none;
+            border-bottom: 2px solid var(--border-color); color: var(--text-color);
+            font-size: 1.35rem; font-weight: bold; text-align: center;
+            margin-bottom: 20px; outline: none; padding-bottom: 8px;
         }
         .header-input:focus { border-bottom-color: var(--primary-color); }
         textarea {
-            width: 100%; height: 160px; background-color: #2c2c2c; color: var(--text-color);
-            border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;
-            font-size: 1rem; resize: vertical; box-sizing: border-box; outline: none; line-height: 1.5;
-            word-break: break-all;
+            width: 100%; height: 160px; background-color: #2c2c2c;
+            color: var(--text-color); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 14px; font-size: 1.05rem;
+            resize: vertical; box-sizing: border-box; outline: none; line-height: 1.6;
         }
-        textarea:focus { border-color: var(--primary-color); }
-        .controls { display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 15px; align-items: center; gap: 10px; flex-wrap: wrap; }
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(187,134,252,0.2);
+        }
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
         .btn {
-            background-color: #333; color: var(--text-color); border: 1px solid var(--border-color);
-            padding: 10px 12px; border-radius: 8px; cursor: pointer; flex-grow: 1; font-size: 0.9rem; text-align: center; transition: 0.2s;
+            flex: 1; padding: 12px 16px; border-radius: 12px; cursor: pointer;
+            font-size: 0.95rem; transition: all 0.2s; border: 1px solid var(--border-color);
+            background: #333; color: var(--text-color); font-weight: 500;
         }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background-color: var(--primary-color); color: #000; font-weight: bold; border: none; }
-        .btn-danger { background-color: transparent; color: var(--error-color); border: 1px solid var(--error-color); font-weight: bold; }
-        .btn-danger:hover { background-color: rgba(207, 102, 121, 0.1); }
-        input[type="password"], select {
-            padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
-            background-color: #2c2c2c; color: var(--text-color); outline: none; width: 100%; box-sizing: border-box; font-size: 1rem;
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary-color); color: #000; font-weight: bold; border: none; }
+        .btn-danger { background: transparent; color: var(--error-color); border: 1px solid var(--error-color); }
+        .password-wrapper { position: relative; width: 100%; }
+        .toggle-btn {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; font-size: 1.35rem; color: #aaa; cursor: pointer; padding: 0 4px;
         }
-        input[type="password"]:focus, select:focus { border-color: var(--primary-color); }
-        .stats { font-size: 0.85rem; color: #aaa; margin-top: 8px; display: flex; justify-content: space-between;}
-        .about { text-align: center; margin-top: 30px; font-size: 0.85rem; color: #777; }
-        #statusMsg { font-size: 0.9rem; margin-top: 15px; text-align: center; min-height: 20px; font-weight: bold; }
+        .stats { font-size: 0.85rem; color: #aaa; margin: 8px 0; display: flex; justify-content: space-between; }
+        #statusMsg { font-size: 0.95rem; margin-top: 15px; text-align: center; min-height: 24px; font-weight: bold; }
+        .about { text-align: center; margin-top: 25px; font-size: 0.8rem; color: #666; }
+        input[type="password"], input[type="text"].pass-text, select {
+            padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);
+            background-color: #2c2c2c; color: var(--text-color); outline: none; width: 100%;
+            box-sizing: border-box; font-size: 1rem;
+        }
+        input:focus, select:focus { border-color: var(--primary-color); }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="app-header">🔐 Secure Messenger</div>
+
     <input type="text" id="fileName" class="header-input" value="Untitled Document" placeholder="Document Name">
 
     <div class="controls">
-        <button class="btn" onclick="setTextDir('ltr')">Left-to-Right (EN)</button>
-        <button class="btn" onclick="setTextDir('rtl')">Right-to-Left (FA)</button>
+        <button class="btn" onclick="setTextDir('ltr')">EN ➡️</button>
+        <button class="btn" onclick="setTextDir('rtl')">⬅️ FA</button>
     </div>
 
     <textarea id="messageBox" placeholder="Type your message or paste encrypted text here..."></textarea>
@@ -69,13 +96,16 @@
         <span id="lengthDisplay" style="color: var(--primary-color);"></span>
     </div>
 
-    <div class="controls" style="margin-top: 20px;">
-        <input type="password" id="secretKey" placeholder="Enter Secret Password">
+    <div class="controls" style="margin-top: 15px;">
+        <div class="password-wrapper">
+            <input type="password" id="secretKey" class="pass-text" placeholder="Enter Secret Password">
+            <button type="button" class="toggle-btn" id="togglePass" onclick="togglePassword()">👁️</button>
+        </div>
     </div>
 
     <div class="controls" style="margin-top: 5px;">
         <select id="expirationSelect">
-            <option value="0">⏳ No Expiration (Never)</option>
+            <option value="0">⏳ No Expiration</option>
             <option value="1">⏳ Expires in 1 Hour</option>
             <option value="24">⏳ Expires in 24 Hours</option>
             <option value="168">⏳ Expires in 7 Days</option>
@@ -83,21 +113,28 @@
     </div>
 
     <div class="controls">
-        <button class="btn btn-primary" onclick="encryptMessage()">Encrypt</button>
-        <button class="btn btn-primary" onclick="decryptMessage()">Decrypt</button>
-    </div>
-    
-    <div class="controls">
-        <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
-        <button class="btn" onclick="pasteAndDecrypt()">Paste & Decrypt</button>
+        <button class="btn btn-primary" onclick="encryptMessage()">🔒 Encrypt</button>
+        <button class="btn btn-primary" onclick="decryptMessage()">🔓 Decrypt</button>
     </div>
 
-    <div class="controls" style="margin-top: 5px;">
-        <button class="btn btn-danger" onclick="clearAllFields()">🗑 Clear Everything</button>
+    <div class="controls">
+        <button class="btn" onclick="copyToClipboard()">📋 Copy</button>
+        <button class="btn" onclick="pasteAndDecrypt()">📝 Paste</button>
     </div>
+    <div class="controls">
+        <button class="btn" onclick="shareMessage()">📤 Share</button>
+        <button class="btn" onclick="downloadFile()">📥 Save File</button>
+    </div>
+
+    <div class="controls" style="margin-top: 15px;">
+        <button class="btn" onclick="document.getElementById('fileUpload').click()">📂 Upload File</button>
+        <button class="btn btn-danger" onclick="clearAllFields()">🗑 Clear</button>
+    </div>
+
+    <input type="file" id="fileUpload" accept=".enc,.txt" style="display:none">
 
     <div id="statusMsg"></div>
-    <div class="about">Developed by me</div>
+    <div class="about">Fully offline • End-to-end encrypted PWA</div>
 </div>
 
 <script>
@@ -108,14 +145,15 @@
     const secretKeyInput = document.getElementById('secretKey');
     const expirationSelect = document.getElementById('expirationSelect');
     const statusMsg = document.getElementById('statusMsg');
+    const togglePassBtn = document.getElementById('togglePass');
 
     let inactivityTimer;
     const TIME_LIMIT = 60000;
 
     function clearSensitiveData() {
-        if(messageBox.value !== '' || secretKeyInput.value !== '') {
+        if (messageBox.value || secretKeyInput.value) {
             messageBox.value = ''; secretKeyInput.value = ''; localStorage.removeItem('savedMessage');
-            updateStats(); showStatus('🔒 Data auto-cleared due to 1 min inactivity.', 'var(--error-color)');
+            updateStats(); showStatus('🔒 Data auto-cleared (1 min inactivity)', 'var(--error-color)');
         }
     }
 
@@ -124,23 +162,23 @@
 
     function clearAllFields() {
         messageBox.value = ''; secretKeyInput.value = ''; localStorage.removeItem('savedMessage');
-        updateStats(); showStatus('🗑 All fields cleared!', 'var(--success-color)'); resetTimer();
+        updateStats(); showStatus('🗑 All fields cleared', 'var(--success-color)'); resetTimer();
     }
 
     window.onload = () => {
         localStorage.removeItem('savedMessage'); messageBox.value = ''; secretKeyInput.value = '';
-        if(localStorage.getItem('savedFileName')) fileName.value = localStorage.getItem('savedFileName');
-        if(localStorage.getItem('savedDir')) messageBox.dir = localStorage.getItem('savedDir');
+        if (localStorage.getItem('savedFileName')) fileName.value = localStorage.getItem('savedFileName');
+        if (localStorage.getItem('savedDir')) messageBox.dir = localStorage.getItem('savedDir');
         updateStats(); resetTimer();
     };
 
     messageBox.addEventListener('input', () => { localStorage.setItem('savedMessage', messageBox.value); updateStats(); });
-    fileName.addEventListener('input', () => { localStorage.setItem('savedFileName', fileName.value); });
+    fileName.addEventListener('input', () => localStorage.setItem('savedFileName', fileName.value));
 
     function updateStats() {
         const text = messageBox.value;
         statsDisplay.textContent = `Characters: ${text.length} | Words: ${text.trim() === '' ? 0 : text.trim().split(/\s+/).length}`;
-        lengthDisplay.textContent = text.length > 0 && !text.includes(' ') && text.length > 50 ? `Length: ${text.length}` : '';
+        lengthDisplay.textContent = (text.length > 60 && !text.includes(' ')) ? `Length: ${text.length}` : '';
     }
 
     function setTextDir(dir) { messageBox.dir = dir; localStorage.setItem('savedDir', dir); }
@@ -149,19 +187,73 @@
         statusMsg.textContent = msg; statusMsg.style.color = color; setTimeout(() => statusMsg.textContent = '', 4500);
     }
 
+    function togglePassword() {
+        if (secretKeyInput.type === 'password') {
+            secretKeyInput.type = 'text'; togglePassBtn.textContent = '🙈';
+        } else {
+            secretKeyInput.type = 'password'; togglePassBtn.textContent = '👁️';
+        }
+    }
+
     async function copyToClipboard() {
         try {
-            if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(messageBox.value); showStatus('Copied!', 'var(--success-color)'); }
-            else { messageBox.select(); document.execCommand('copy'); window.getSelection().removeAllRanges(); showStatus('Copied (Legacy)!', 'var(--success-color)'); }
-        } catch (err) { showStatus('Copy failed.', 'var(--error-color)'); }
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(messageBox.value);
+                showStatus('✅ Copied to clipboard', 'var(--success-color)');
+            } else {
+                messageBox.select(); document.execCommand('copy'); window.getSelection().removeAllRanges();
+                showStatus('✅ Copied (Legacy Mode)', 'var(--success-color)');
+            }
+        } catch (err) { showStatus('Copy failed. Please copy manually.', 'var(--error-color)'); }
     }
 
     async function pasteAndDecrypt() {
         try {
-            if (navigator.clipboard && navigator.clipboard.readText) { const text = await navigator.clipboard.readText(); if(text) { messageBox.value = text; decryptMessage(); } else showStatus('Clipboard empty.', 'var(--error-color)'); }
-            else showStatus('Paste manually.', 'var(--error-color)');
-        } catch (err) { showStatus('Paste manually.', 'var(--error-color)'); }
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                const text = await navigator.clipboard.readText();
+                if(text) { messageBox.value = text; decryptMessage(); }
+                else showStatus('Clipboard is empty.', 'var(--error-color)');
+            } else showStatus('Auto-paste blocked. Paste manually.', 'var(--error-color)');
+        } catch (err) { showStatus('Auto-paste blocked. Paste manually.', 'var(--error-color)'); }
     }
+
+    async function shareMessage() {
+        if (!messageBox.value) return showStatus('Nothing to share!', 'var(--error-color)');
+        if (navigator.share) {
+            try { await navigator.share({ title: fileName.value || 'Encrypted Message', text: messageBox.value }); showStatus('📤 Shared successfully', 'var(--success-color)'); }
+            catch (e) { /* کاربر به اشتراک گذاری را کنسل کرده */ }
+        } else showStatus('Share not supported in this browser', 'var(--error-color)');
+    }
+
+    // Download functionality (The missing piece for your upload)
+    function downloadFile() {
+        if (!messageBox.value) return showStatus('Nothing to save!', 'var(--error-color)');
+        const blob = new Blob([messageBox.value], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const name = fileName.value.trim() || 'Untitled';
+        a.href = url;
+        a.download = name + '.enc';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showStatus('📥 File saved!', 'var(--success-color)');
+    }
+
+    // Upload functionality (Fixed duplicate bug)
+    document.getElementById('fileUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            messageBox.value = ev.target.result;
+            fileName.value = file.name.replace('.enc', '').replace('.txt', '') || 'Untitled Document';
+            updateStats(); showStatus('📂 File uploaded successfully', 'var(--success-color)');
+        };
+        reader.readAsText(file);
+        this.value = null; // Reset input to allow selecting the same file again
+    });
 
     async function getCryptoKey(password, salt) {
         const keyMaterial = await window.crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
@@ -185,93 +277,73 @@
     }
 
     async function encryptMessage() {
-        if (!secretKeyInput.value || !messageBox.value) return showStatus('Password & Message required.', 'var(--error-color)');
+        if (!secretKeyInput.value || !messageBox.value) return showStatus('Password and message are required', 'var(--error-color)');
         try {
             const expHours = parseInt(expirationSelect.value);
             const expTime = expHours === 0 ? 0 : Date.now() + (expHours * 60 * 60 * 1000);
-            
-            // 1. Minified JSON
             const payload = JSON.stringify({ e: expTime, m: messageBox.value });
             let payloadBytes = new TextEncoder().encode(payload);
             let isCompressed = 0;
 
-            // 2. Smart Compression (فقط پیام‌های طولانی فشرده می‌شوند)
             if (payloadBytes.length > 100) {
-                const compressedBuf = await compressData(payload);
-                payloadBytes = new Uint8Array(compressedBuf);
-                isCompressed = 1;
+                payloadBytes = new Uint8Array(await compressData(payload)); isCompressed = 1;
             }
 
             const finalPayload = new Uint8Array(payloadBytes.length + 1);
-            finalPayload[0] = isCompressed; // ثبت وضعیت فشرده‌سازی
-            finalPayload.set(payloadBytes, 1);
+            finalPayload[0] = isCompressed; finalPayload.set(payloadBytes, 1);
 
             const salt = window.crypto.getRandomValues(new Uint8Array(16));
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const key = await getCryptoKey(secretKeyInput.value, salt);
-            
+
             const encryptedBuf = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, finalPayload);
             const encryptedBytes = new Uint8Array(encryptedBuf);
 
-            // 3. Binary Merge (ادغام تمام داده‌ها برای کوتاه شدن بیس۶۴)
             const combined = new Uint8Array(16 + 12 + encryptedBytes.length);
             combined.set(salt, 0); combined.set(iv, 16); combined.set(encryptedBytes, 28);
 
             messageBox.value = bufferToBase64(combined.buffer);
             localStorage.setItem('savedMessage', messageBox.value); updateStats();
-            showStatus('Optimized & Encrypted!', 'var(--success-color)');
-        } catch (e) { showStatus('Encryption failed!', 'var(--error-color)'); console.error(e); }
+            showStatus('✅ Encrypted successfully!', 'var(--success-color)');
+        } catch (e) { showStatus('Encryption failed', 'var(--error-color)'); }
     }
 
     async function decryptMessage() {
-        if (!secretKeyInput.value || !messageBox.value) return showStatus('Password & Message required.', 'var(--error-color)');
+        if (!secretKeyInput.value || !messageBox.value) return showStatus('Password and message are required', 'var(--error-color)');
         try {
-            // پشتیبانی از فرمت قدیمی (دارای کالن)
-            if(messageBox.value.includes(':')) {
+            if (messageBox.value.includes(':')) {
                 const parts = messageBox.value.split(':');
                 if (parts.length !== 3) throw new Error("Invalid format");
                 const key = await getCryptoKey(secretKeyInput.value, base64ToBuffer(parts[0]));
                 const decryptedBuffer = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(parts[1]) }, key, base64ToBuffer(parts[2]));
-                
                 let decryptedText = "";
                 try { decryptedText = new TextDecoder().decode(await decompressData(decryptedBuffer)); }
                 catch(e) { decryptedText = new TextDecoder().decode(decryptedBuffer); }
-                
-                try {
-                    const payload = JSON.parse(decryptedText);
-                    if (payload.exp && payload.exp !== 0 && Date.now() > payload.exp) { messageBox.value = ''; return showStatus('⏳ Expired.', 'var(--error-color)'); }
-                    messageBox.value = payload.msg || decryptedText;
-                } catch(e) { messageBox.value = decryptedText; }
-            }
-            // فرمت جدید و کوتاه شده
-            else {
+                const payload = JSON.parse(decryptedText);
+                if (payload.exp && payload.exp !== 0 && Date.now() > payload.exp) { messageBox.value = ''; return showStatus('⏳ Message has expired', 'var(--error-color)'); }
+                messageBox.value = payload.msg || decryptedText;
+            } else {
                 const combined = new Uint8Array(base64ToBuffer(messageBox.value));
-                if(combined.length < 28) throw new Error("Invalid format");
-                
-                const salt = combined.slice(0, 16);
-                const iv = combined.slice(16, 28);
-                const encryptedBytes = combined.slice(28);
+                if (combined.length < 28) throw new Error("Invalid format");
+                const salt = combined.slice(0, 16); const iv = combined.slice(16, 28); const encryptedBytes = combined.slice(28);
 
                 const key = await getCryptoKey(secretKeyInput.value, salt);
                 const decryptedBuffer = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, encryptedBytes);
                 const decryptedBytes = new Uint8Array(decryptedBuffer);
 
-                const isCompressed = decryptedBytes[0] === 1;
-                const payloadBytes = decryptedBytes.slice(1);
-
+                const isCompressed = decryptedBytes[0] === 1; const payloadBytes = decryptedBytes.slice(1);
                 let decryptedText = isCompressed ? new TextDecoder().decode(await decompressData(payloadBytes.buffer)) : new TextDecoder().decode(payloadBytes);
-                
+
                 const payload = JSON.parse(decryptedText);
-                if (payload.e !== 0 && Date.now() > payload.e) { messageBox.value = ''; return showStatus('⏳ Expired.', 'var(--error-color)'); }
+                if (payload.e !== 0 && Date.now() > payload.e) { messageBox.value = ''; return showStatus('⏳ Message has expired', 'var(--error-color)'); }
                 messageBox.value = payload.m;
             }
-
             localStorage.setItem('savedMessage', messageBox.value); updateStats();
-            showStatus('Decrypted!', 'var(--success-color)');
-        } catch (e) { showStatus('Decryption failed! Wrong password.', 'var(--error-color)'); console.error(e); }
+            showStatus('✅ Decrypted successfully!', 'var(--success-color)');
+        } catch (e) { showStatus('Decryption failed! Wrong password?', 'var(--error-color)'); }
     }
 
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err=>console.error('SW Error:', err)); }); }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.error(e)); }); }
 </script>
 </body>
 </html>
